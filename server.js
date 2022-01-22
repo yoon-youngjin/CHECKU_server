@@ -3,13 +3,17 @@
 // const mongoose = require('mongoose');
 import dotenv from 'dotenv';
 import express from 'express';
+import subRoutes from './routes/subRoutes.js';
 import userRoutes from './routes/UserRoutes.js';
+
 dotenv.config();
 
 const app = express();
 // 미들웨어 -> 순서대로 수행
 app.use(express.json());
 // app.use('/api/user', userRoutes);
+
+app.post('/click', subRoutes);
 
 app.post('/signup', userRoutes);
 

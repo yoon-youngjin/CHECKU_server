@@ -9,7 +9,6 @@ mongoClient.connect(url, (err, db) => {
     if (err) {
         console.log('Error....');
     } else {
-        console.log('plz');
         const mydb = db.db('Cluster0');
         const collection = mydb.collection('myTable');
         app.post('/signup', (req, res) => {
