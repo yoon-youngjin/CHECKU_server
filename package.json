@@ -2,18 +2,20 @@
   "name": "my-app-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "dependencies": {
     "dotenv": "^14.2.0",
     "express": "^4.17.2",
     "mongodb": "^4.3.0",
-    "mongoose": "^6.1.7"
+    "mongoose": "^6.1.7",
+    "selenium-webdriver": "^4.1.1"
   },
-  "type":"module",
+  "type": "module",
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
-    "dev" : "nodemon index.js"},
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
