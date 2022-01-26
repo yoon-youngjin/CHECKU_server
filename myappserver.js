@@ -5,6 +5,11 @@ const mongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 app.use(express.json());
 
+
+
+
+
+
 mongoClient.connect(url, (err, db) => {
     if (err) {
         console.log('Error....');

@@ -25,7 +25,7 @@ const subjectSchema = new Schema(
         subject_num: {
             type: String,
             required: true,
-        },
+        }
     },
     { timestamps: true }
 );

@@ -3,13 +3,68 @@
 import Subject from '../models/subjectModel.js';
 import mongo from 'mongodb';
 const mongoClient = mongo.MongoClient;
+import { Builder, By, Key, until } from 'selenium-webdriver';
+
 import dotenv from 'dotenv';
 dotenv.config();
-
 export const subController = (req, res) => {
     const post = req.body;
 
-    console.log(post.pro_name);
+    console.log(post.subject_num);
+
+    (async function startCrawling() {
+        // let option = driver.ChromeOptions();
+        // options.add_experimental_option('excludeSwitches', ['enable-logging']);
+        // let browser = driver.Chrome((options = option));
+        try {
+            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+            await driver.get('https://sugang.konkuk.ac.kr/');
+            await driver.switchTo().frame(driver.findElement(By.id('Main')));
+            await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
+            await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
+            await driver.findElement(By.className('btn-login')).click();
+
+            await driver.wait(until.ableToSwitchToFrame(By.id('coreMain')), 10000);
+
+            await driver.findElement(By.id('menu_search')).click();
+
+            const click = await driver.wait(until.elementLocated(By.xpath('//*[@id="sForm"]/table/tbody/tr[1]/td[2]/label[2]')));
+            click.click();
+
+            await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
+            await driver.findElement(By.id('pSearchKind')).sendKeys('과목번호');
+
+            await driver.findElement(By.id('pSearchNm')).sendKeys(post.subject_num);
+
+            await driver.findElement(By.id('btnSearch')).click();
+            await driver.sleep(1000);
+
+            let check = 0;
+            let data;
+            while (true) {
+                // if (check === 3) {
+                //     res.status(200).send(data[0]);
+                //     break;
+                // } else {
+                await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
+                const temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
+                data = await (await temp.getText()).split('/');
+                await driver.sleep(1000);
+                console.log(await data[0]);
+                // }
+                await console.log(check);
+                await check++;
+            }
+            //*[@id="btnRefresh"]
+            // const table = await driver.wait(until.elementLocated(By.xpath('//*[@id="gridLecture"]/tbody'))).then((result) => {
+            //     return result;
+            // });
+            // console.log(await table.getText());
+        } finally {
+            // driver.quit();
+        }
+    })();
+
     const newSubject = new Subject({
         title: req.body.sub_title,
         professor_name: req.body.pro_name,
@@ -17,8 +72,6 @@ export const subController = (req, res) => {
         current_num: req.body.current_num,
         subject_num: req.body.subject_num,
     });
-
-    res.status(200).send();
 
     // mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
     //     if (err) {
