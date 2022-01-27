@@ -18,6 +18,7 @@ export const subController = (req, res) => {
         // let browser = driver.Chrome((options = option));
         try {
             let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+
             await driver.get('https://sugang.konkuk.ac.kr/');
             await driver.switchTo().frame(driver.findElement(By.id('Main')));
             await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
@@ -42,26 +43,25 @@ export const subController = (req, res) => {
             let check = 0;
             let data;
             while (true) {
-                // if (check === 3) {
-                //     res.status(200).send(data[0]);
-                //     break;
-                // } else {
-                await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
-                const temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
-                data = await (await temp.getText()).split('/');
-                await driver.sleep(1000);
-                console.log(await data[0]);
-                // }
+                if (check === 20) {
+                    res.status(200).send(post.subject_num);
+                    break;
+                } else {
+                    await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
+                    let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
+                    data = await (await temp.getText()).split('/');
+                    await driver.sleep(1500);
+                    if ((await data[0]) === 'Loading') {
+                        continue;
+                    }
+                    console.log(await data[0]);
+                }
+
                 await console.log(check);
                 await check++;
             }
-            //*[@id="btnRefresh"]
-            // const table = await driver.wait(until.elementLocated(By.xpath('//*[@id="gridLecture"]/tbody'))).then((result) => {
-            //     return result;
-            // });
-            // console.log(await table.getText());
         } finally {
-            // driver.quit();
+            driver.quit();
         }
     })();
 
