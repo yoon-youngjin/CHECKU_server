@@ -7,7 +7,7 @@ import { Builder, By, Key, until } from 'selenium-webdriver';
 
 import dotenv from 'dotenv';
 dotenv.config();
-export const subController = (req, res) => {
+export const lectureController = (req, res) => {
     const post = req.body;
 
     console.log(post.subject_num);

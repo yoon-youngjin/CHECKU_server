@@ -3,9 +3,8 @@
 // const mongoose = require('mongoose');
 import dotenv from 'dotenv';
 import express from 'express';
-import subRoutes from './routes/subRoutes.js';
+import lectureRoutes from './routes/lectureRoutes.js';
 import userRoutes from './routes/UserRoutes.js';
-import { Builder, By, Key, until } from 'selenium-webdriver';
 
 // (async function example() {
 //     let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
@@ -50,12 +49,12 @@ const app = express();
 app.use(express.json());
 // app.use('/api/user', userRoutes);
 
-app.post('/click', subRoutes);
+app.post('/click', lectureRoutes);
 
 app.post('/signup', userRoutes);
 
 app.post('/login', userRoutes);
 
-app.listen(3000, () => {
+app.listen(2000, () => {
     console.log('Example app listening on port 3000!');
 });
