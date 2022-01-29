@@ -4,74 +4,40 @@ import Subject from '../models/subjectModel.js';
 import mongo from 'mongodb';
 const mongoClient = mongo.MongoClient;
 import { Builder, By, Key, until } from 'selenium-webdriver';
+import lodash from 'lodash';
 
 import dotenv from 'dotenv';
 dotenv.config();
+let arr = [];
+let map = new Map();
+let current_process_num = 0;
 export const lectureController = (req, res) => {
     const post = req.body;
 
-    console.log(post.subject_num);
+    // console.log(post.subject_num);
+    console.log(post.start);
 
-    (async function startCrawling() {
-        // let option = driver.ChromeOptions();
-        // options.add_experimental_option('excludeSwitches', ['enable-logging']);
-        // let browser = driver.Chrome((options = option));
-        try {
-            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+    switch (post.start) {
+        case '0':
+            map.set(post.subject_num, lodash.cloneDeep(a));
+            map.get(post.subject_num).startCrawling(post);
 
-            await driver.get('https://sugang.konkuk.ac.kr/');
-            await driver.switchTo().frame(driver.findElement(By.id('Main')));
-            await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
-            await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
-            await driver.findElement(By.className('btn-login')).click();
+            // arr[current_process_num++].startCrawling(post);
+            break;
+        case '1':
+            (async function ex() {
+                map.get(post.subject_num).cancel_check = false;
+            })();
+            break;
+    }
 
-            await driver.wait(until.ableToSwitchToFrame(By.id('coreMain')), 10000);
-
-            await driver.findElement(By.id('menu_search')).click();
-
-            const click = await driver.wait(until.elementLocated(By.xpath('//*[@id="sForm"]/table/tbody/tr[1]/td[2]/label[2]')));
-            click.click();
-
-            await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
-            await driver.findElement(By.id('pSearchKind')).sendKeys('과목번호');
-
-            await driver.findElement(By.id('pSearchNm')).sendKeys(post.subject_num);
-
-            await driver.findElement(By.id('btnSearch')).click();
-            await driver.sleep(1000);
-
-            let check = 0;
-            let data;
-            while (true) {
-                if (check === 20) {
-                    res.status(200).send(post.subject_num);
-                    break;
-                } else {
-                    await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
-                    let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
-                    data = await (await temp.getText()).split('/');
-                    await driver.sleep(1500);
-                    if ((await data[0]) === 'Loading') {
-                        continue;
-                    }
-                    console.log(await data[0]);
-                }
-
-                await console.log(check);
-                await check++;
-            }
-        } finally {
-            driver.quit();
-        }
-    })();
-
-    const newSubject = new Subject({
-        title: req.body.sub_title,
-        professor_name: req.body.pro_name,
-        total_num: req.body.total_num,
-        current_num: req.body.current_num,
-        subject_num: req.body.subject_num,
-    });
+    // const newSubject = new Subject({
+    //     title: req.body.sub_title,
+    //     professor_name: req.body.pro_name,
+    //     total_num: req.body.total_num,
+    //     current_num: req.body.current_num,
+    //     subject_num: req.body.subject_num,
+    // });
 
     // mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
     //     if (err) {
@@ -101,4 +67,121 @@ export const lectureController = (req, res) => {
     //         });
     //     }
     // });
+};
+
+let a = {
+    cancel_check: true,
+    startCrawling: async function (post) {
+        // let option = driver.ChromeOptions();
+        // options.add_experimental_option('excludeSwitches', ['enable-logging']);
+        // let browser = driver.Chrome((options = option));
+
+        try {
+            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+            await driver.get('https://sugang.konkuk.ac.kr/');
+            await driver.switchTo().frame(driver.findElement(By.id('Main')));
+            await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
+            await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
+            await driver.findElement(By.className('btn-login')).click();
+
+            await driver.wait(until.ableToSwitchToFrame(By.id('coreMain')), 10000);
+
+            await driver.findElement(By.id('menu_search')).click();
+
+            const click = await driver.wait(until.elementLocated(By.xpath('//*[@id="sForm"]/table/tbody/tr[1]/td[2]/label[2]')));
+            click.click();
+
+            await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
+            await driver.findElement(By.id('pSearchKind')).sendKeys('과목번호');
+
+            await driver.findElement(By.id('pSearchNm')).sendKeys(post.subject_num);
+
+            await driver.findElement(By.id('btnSearch')).click();
+            await driver.sleep(1000);
+
+            let check = 0;
+            let data;
+            while (true) {
+                if (this.cancel_check == false) {
+                    await console.log("I'm out");
+                    res.status(200).send();
+                    break;
+                }
+
+                if (check === 20) {
+                    res.status(200).send(post.subject_num);
+                    break;
+                } else {
+                    await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
+                    let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
+                    data = await (await temp.getText()).split('/');
+                    await driver.sleep(1500);
+                    if ((await data[0]) === 'Loading') {
+                        continue;
+                    }
+                    console.log(await data[0]);
+                }
+
+                await console.log(check);
+                await check++;
+            }
+        } finally {
+            driver.quit();
+        }
+    },
+};
+
+let startCrawling = async function (post) {
+    // let option = driver.ChromeOptions();
+    // options.add_experimental_option('excludeSwitches', ['enable-logging']);
+    // let browser = driver.Chrome((options = option));
+
+    startCrawling.prototype.cancel_check = true;
+
+    try {
+        let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+        await driver.get('https://sugang.konkuk.ac.kr/');
+        await driver.switchTo().frame(driver.findElement(By.id('Main')));
+        await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
+        await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
+        await driver.findElement(By.className('btn-login')).click();
+
+        await driver.wait(until.ableToSwitchToFrame(By.id('coreMain')), 10000);
+
+        await driver.findElement(By.id('menu_search')).click();
+
+        const click = await driver.wait(until.elementLocated(By.xpath('//*[@id="sForm"]/table/tbody/tr[1]/td[2]/label[2]')));
+        click.click();
+
+        await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
+        await driver.findElement(By.id('pSearchKind')).sendKeys('과목번호');
+
+        await driver.findElement(By.id('pSearchNm')).sendKeys(post.subject_num);
+
+        await driver.findElement(By.id('btnSearch')).click();
+        await driver.sleep(1000);
+
+        let check = 0;
+        let data;
+        while (cancel_check) {
+            if (check === 20) {
+                res.status(200).send(post.subject_num);
+                break;
+            } else {
+                await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
+                let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
+                data = await (await temp.getText()).split('/');
+                await driver.sleep(1500);
+                if ((await data[0]) === 'Loading') {
+                    continue;
+                }
+                console.log(await data[0]);
+            }
+
+            await console.log(check);
+            await check++;
+        }
+    } finally {
+        driver.quit();
+    }
 };
