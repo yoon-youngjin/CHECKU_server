@@ -64,12 +64,15 @@ export const lectureController = (req, res) => {
 let monitor = {
     cancel_check: true,
     startCrawling: async function (post) {
-        // let option = driver.ChromeOptions();
         // options.add_experimental_option('excludeSwitches', ['enable-logging']);
         // let browser = driver.Chrome((options = option));
 
         try {
-            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+            let option = driver.ChromeOptions();
+            option.addArgument('headless');
+
+            let driver = await new Builder('./chromedriver').forBrowser('chrome').setChromeOptions(option).build();
+
             await driver.get('https://sugang.konkuk.ac.kr/');
             await driver.switchTo().frame(driver.findElement(By.id('Main')));
             await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');

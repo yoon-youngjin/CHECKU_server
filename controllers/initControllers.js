@@ -1,11 +1,15 @@
 import { Builder, By, Key, until } from 'selenium-webdriver';
 import dotenv from 'dotenv';
 dotenv.config();
+
 export const initController = (req, res) => {
-    (async function test() {
+    (async function init() {
         try {
-            await console.log('init');
-            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+            let option = driver.ChromeOptions();
+            option.addArgument('headless');
+
+            let driver = await new Builder('./chromedriver').forBrowser('chrome').setChromeOptions(option).build();
+            console.log('start');
             await driver.get('https://sugang.konkuk.ac.kr/');
             await driver.switchTo().frame(driver.findElement(By.id('Main')));
             await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
@@ -22,56 +26,31 @@ export const initController = (req, res) => {
             await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
 
             await driver.findElement(By.id('btnSearch')).click();
-            await driver.sleep(1000);
+            await driver.sleep(500);
 
-            let obj = {};
+            let obj = [];
+            let obj2 = [];
             let json = {};
-            let item1 = new Object();
-            let item2 = new Object();
+            let j = 0;
 
-            for (let i = 0; i < 2; i++) {
-                await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[19]/button')).click();
-                // await driver.sleep(50);
-
-                let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[18]'));
-                let temp2 = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[17]'));
-                // console.log(await temp.getText());
-                // console.log(await temp2.getText());
-                // json[i] = (await temp.getText()) + ' ' + (await temp2.getText());
-                json[i] = await temp.getText();
-
-                // if (i == 0) {
-                //     item1[i] = await temp.getText();
-                //     await console.log(item1);
-                //     await json.push(item1);
-                //     await console.log(json);
-                // }
-                // if (i == 1) {
-                //     item2[i] = await temp.getText();
-                //     await console.log(item2);
-                //     await json.push(item2);
-                // }
-
-                // console.log(json[i]);
-
-                // obj['/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[19]/button'] =
-                //     '/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[18]';
-
-                // console.log(obj[str]);
+            for (let i = 0; i < 57; i++) {
+                obj[i] = driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (i + 2) + ']/td[19]/button'));
+                obj2[i] = i;
             }
-            await console.log(json);
-            // await console.log(JSON.stringify(json));
-            await res.status(200).send(JSON.stringify(json));
+            await Promise.all(
+                obj.map(async (value) => {
+                    value.click();
+                })
+            ).then(() => {
+                (async function test() {
+                    for (let temp of obj2) {
+                        json[temp] = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[' + (temp + 2) + ']/td[18]')).getText();
+                    }
+                    await res.status(200).send(JSON.stringify(json));
+                })();
 
-            // for await (let i = 0; i < 57; i++) {
-            //     await driver.findElement(By.xpath(obj[str])).click();
-            //     let temp = await driver.findElement(By.xpath(str)).click();
-            //     await driver.sleep(1000);
-
-            //     data = await (await temp.getText()).split('/');
-            //     await driver.sleep(1500);
-            //     await console.log(data[0]);
-            // }
+                console.log('test');
+            });
         } finally {
             driver.quit();
         }
