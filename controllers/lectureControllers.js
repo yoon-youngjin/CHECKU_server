@@ -4,9 +4,12 @@ import Subject from '../models/subjectModel.js';
 import mongo from 'mongodb';
 const mongoClient = mongo.MongoClient;
 import { Builder, By, Key, until } from 'selenium-webdriver';
+import chrome from '../node_modules/selenium-webdriver/chrome.js';
 import lodash from 'lodash';
 import dotenv from 'dotenv';
 dotenv.config();
+let count = 0;
+let time = 2000;
 let map = new Map();
 export const lectureController = (req, res) => {
     const post = req.body;
@@ -14,7 +17,14 @@ export const lectureController = (req, res) => {
     switch (post.checked) {
         case 'true':
             map.set(post.subject_num, lodash.cloneDeep(monitor));
-            map.get(post.subject_num).startCrawling(post);
+            if (count >= 1) {
+                setTimeout(map.get(post.subject_num).startCrawling, time, post, res);
+                // 수정요소가 보임
+                time += 2000;
+            } else {
+                map.get(post.subject_num).startCrawling(post, res);
+                count++;
+            }
             break;
         case 'false':
             (async function stop() {
@@ -63,18 +73,13 @@ export const lectureController = (req, res) => {
 
 let monitor = {
     cancel_check: true,
-    startCrawling: async function (post) {
-        // options.add_experimental_option('excludeSwitches', ['enable-logging']);
-        // let browser = driver.Chrome((options = option));
-
+    startCrawling: async function (post, res) {
         try {
-            let option = driver.ChromeOptions();
-            option.addArgument('headless');
-
-            let driver = await new Builder('./chromedriver').forBrowser('chrome').setChromeOptions(option).build();
-
+            // let driver = await new Builder('./chromedriver').forBrowser('chrome').setChromeOptions(new chrome.Options().headless()).build();
+            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
             await driver.get('https://sugang.konkuk.ac.kr/');
             await driver.switchTo().frame(driver.findElement(By.id('Main')));
+
             await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
             await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
             await driver.findElement(By.className('btn-login')).click();
@@ -102,7 +107,7 @@ let monitor = {
                     res.status(200).send(post.subject_num);
                     break;
                 }
-                if (check === 20) {
+                if (check === 10) {
                     res.status(200).send(post.subject_num);
                     break;
                 } else {
@@ -119,8 +124,9 @@ let monitor = {
                 await console.log(check);
                 await check++;
             }
+        } catch {
         } finally {
-            driver.quit();
+            // driver.quit();
         }
     },
 };

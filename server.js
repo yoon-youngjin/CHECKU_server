@@ -6,7 +6,7 @@ import express from 'express';
 import lectureRoutes from './routes/lectureRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import initRoutes from './routes/initRoutes.js';
-import { Builder, By, Key, until } from 'selenium-webdriver';
+
 dotenv.config();
 
 const app = express();
