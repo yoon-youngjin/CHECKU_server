@@ -3,28 +3,26 @@
 import Subject from '../models/subjectModel.js';
 import mongo from 'mongodb';
 const mongoClient = mongo.MongoClient;
-import { Builder, By, Key, until } from 'selenium-webdriver';
-import chrome from '../node_modules/selenium-webdriver/chrome.js';
+
 import lodash from 'lodash';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch';
+
 dotenv.config();
 let count = 0;
 let time = 2000;
 let map = new Map();
+
 export const lectureController = (req, res) => {
     const post = req.body;
+    console.log(post.checked);
 
     switch (post.checked) {
         case 'true':
-            map.set(post.subject_num, lodash.cloneDeep(monitor));
-            if (count >= 1) {
-                setTimeout(map.get(post.subject_num).startCrawling, time, post, res);
-                // 수정요소가 보임
-                time += 2000;
-            } else {
+            (async () => {
+                map.set(post.subject_num, lodash.cloneDeep(monitor));
                 map.get(post.subject_num).startCrawling(post, res);
-                count++;
-            }
+            })();
             break;
         case 'false':
             (async function stop() {
@@ -72,61 +70,70 @@ export const lectureController = (req, res) => {
 };
 
 let monitor = {
+    check: 0,
     cancel_check: true,
     startCrawling: async function (post, res) {
-        try {
-            // let driver = await new Builder('./chromedriver').forBrowser('chrome').setChromeOptions(new chrome.Options().headless()).build();
-            let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
-            await driver.get('https://sugang.konkuk.ac.kr/');
-            await driver.switchTo().frame(driver.findElement(By.id('Main')));
-
-            await driver.findElement(By.id('stdNo')).sendKeys('dudwls143');
-            await driver.findElement(By.id('pwd')).sendKeys('@dudwlsdl12');
-            await driver.findElement(By.className('btn-login')).click();
-
-            await driver.wait(until.ableToSwitchToFrame(By.id('coreMain')), 10000);
-
-            await driver.findElement(By.id('menu_search')).click();
-
-            const click = await driver.wait(until.elementLocated(By.xpath('//*[@id="sForm"]/table/tbody/tr[1]/td[2]/label[2]')));
-            click.click();
-
-            await driver.findElement(By.id('pSustMjCd')).sendKeys('컴퓨터공학과');
-            await driver.findElement(By.id('pSearchKind')).sendKeys('과목번호');
-
-            await driver.findElement(By.id('pSearchNm')).sendKeys(post.subject_num);
-
-            await driver.findElement(By.id('btnSearch')).click();
-            await driver.sleep(1000);
-
-            let check = 0;
-            let data;
-            while (true) {
-                if (this.cancel_check == false) {
-                    await console.log("I'm out");
-                    res.status(200).send(post.subject_num);
-                    break;
-                }
-                if (check === 10) {
-                    res.status(200).send(post.subject_num);
-                    break;
-                } else {
-                    await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[19]/button')).click();
-                    let temp = await driver.findElement(By.xpath('/html/body/div[2]/main/div/div/div/div[1]/div[2]/div/div[3]/div[3]/div/table/tbody/tr[2]/td[18]'));
-                    data = await (await temp.getText()).split('/');
-                    await driver.sleep(1500);
-                    if ((await data[0]) === 'Loading') {
-                        continue;
-                    }
-                    console.log(await data[0]);
-                }
-
-                await console.log(check);
-                await check++;
+        while (true) {
+            // 모니터링 종료 부분
+            if (count === 10) {
+                console.log(count);
+                res.status(200).send('im out');
+                return;
             }
-        } catch {
-        } finally {
-            // driver.quit();
+            // 모니터링 취소 부분
+            if (this.cancel_check == false) {
+                res.status(200).send(post.subject_num);
+                return;
+            }
+
+            await fetch(`https://sugang.konkuk.ac.kr/sugang/login?attribute=loginChk&fake=${new Date().getTime()}`, {
+                headers: {
+                    accept: 'application/json, text/javascript, */*; q=0.01',
+                    'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+                    'sec-ch-ua-mobile': '?0',
+                    'sec-ch-ua-platform': '"Windows"',
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'same-origin',
+                    'x-requested-with': 'XMLHttpRequest',
+                },
+                referrer: 'https://sugang.konkuk.ac.kr/sugang/login',
+                referrerPolicy: 'strict-origin-when-cross-origin',
+                body: 'stdNo=gb0409&pwd=0409bong%40%40&campFg=1&idPassGubun=1&lang=ko',
+                method: 'POST',
+                mode: 'cors',
+                credentials: 'include',
+            })
+                .then((res) => res.headers.get('set-cookie'))
+                .then((e) => e.split('JSESSIONID=')[1].split(';')[0])
+                .then((e) => {
+                    fetch(`https://sugang.konkuk.ac.kr/sugang/search?attribute=inwonData&pSbjtId=${post.subject_num}&gbn=S&fake=${new Date().getTime()}`, {
+                        headers: {
+                            accept: 'application/json, text/javascript, */*; q=0.01',
+                            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                            'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+                            'sec-ch-ua-mobile': '?0',
+                            'sec-ch-ua-platform': '"Windows"',
+                            'sec-fetch-dest': 'empty',
+                            'sec-fetch-mode': 'cors',
+                            'sec-fetch-site': 'same-origin',
+                            'x-requested-with': 'XMLHttpRequest',
+                            cookie: `COOK_TS=${new Date().getTime()}; WMONID=s22F_DscdSX; JSESSIONID=${e}; my-application-browser-tab={"guid":"a0c01fcd-84f4-7364-e630-2593be577176","timestamp":${new Date().getTime()}}`,
+                            Referer: `https://sugang.konkuk.ac.kr/sugang/core?attribute=coreMain&fake=${new Date().getTime()}`,
+                            'Referrer-Policy': 'strict-origin-when-cross-origin',
+                        },
+                        body: null,
+                        method: 'POST',
+                    })
+                        .then((e) => e.json())
+                        .then((e) => {
+                            count++;
+                            console.log(e.rows[0].inwon_all);
+                            console.log(this.cancel_check);
+                        });
+                });
         }
     },
 };
