@@ -6,6 +6,7 @@ import express from 'express';
 import lectureRoutes from './routes/lectureRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import initRoutes from './routes/initRoutes.js';
+import fetch from 'node-fetch';
 
 dotenv.config();
 const app = express();
