@@ -85,7 +85,6 @@ let monitor = {
                 res.status(200).send(post.subject_num);
                 return;
             }
-
             await fetch(`https://sugang.konkuk.ac.kr/sugang/login?attribute=loginChk&fake=${new Date().getTime()}`, {
                 headers: {
                     accept: 'application/json, text/javascript, */*; q=0.01',
