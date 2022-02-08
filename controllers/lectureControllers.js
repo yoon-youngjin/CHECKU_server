@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
 dotenv.config();
-let count = 0;
 let time = 2000;
 let map = new Map();
 
@@ -70,14 +69,15 @@ export const lectureController = (req, res) => {
 };
 
 let monitor = {
-    check: 0,
+    count: 0,
     cancel_check: true,
     startCrawling: async function (post, res) {
         while (true) {
             // 모니터링 종료 부분
-            if (count === 10) {
+            if (this.count === 10) {
                 console.log(count);
                 res.status(200).send('im out');
+                this.count = 0;
                 return;
             }
             // 모니터링 취소 부분
@@ -128,7 +128,7 @@ let monitor = {
                     })
                         .then((e) => e.json())
                         .then((e) => {
-                            count++;
+                            this.count++;
                             console.log(e.rows[0].inwon_all);
                             console.log(this.cancel_check);
                         });
