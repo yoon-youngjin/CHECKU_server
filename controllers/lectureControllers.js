@@ -1,14 +1,14 @@
 // route안에 들어가는 수행내용이 복잡해질 경우를 대비해서
 // controller를 통해 제어
-import Subject from '../models/subjectModel.js';
-import mongo from 'mongodb';
-const mongoClient = mongo.MongoClient;
+// import Subject from '../models/subjectModel.js';
+// import mongo from 'mongodb';
+// const mongoClient = mongo.MongoClient;
 
 import lodash from 'lodash';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
-dotenv.config();
+// dotenv.config();
 let time = 2000;
 let map = new Map();
 

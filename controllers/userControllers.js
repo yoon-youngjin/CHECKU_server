@@ -1,10 +1,10 @@
 // route안에 들어가는 수행내용이 복잡해질 경우를 대비해서
 // controller를 통해 제어
-import User from '../models/userModel.js';
-import mongo from 'mongodb';
-const mongoClient = mongo.MongoClient;
-import dotenv from 'dotenv';
-dotenv.config();
+// import User from '../models/userModel.js';
+// import mongo from 'mongodb';
+// const mongoClient = mongo.MongoClient;
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 export const userSignupController = (req, res) => {
     mongoClient.connect(process.env.MONGODB_URL, (err, db) => {
