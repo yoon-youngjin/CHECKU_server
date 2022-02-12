@@ -11,16 +11,19 @@ class Subject {
             this.detail = build.detail;
         }
     }
+
     static get Builder() {
         class Builder {
             setId(id) {
                 this.id = id;
                 return this;
             }
+
             setName(name) {
                 this.name = name;
                 return this;
             }
+
             setProfessor(professor) {
                 this.professor = professor;
                 return this;
@@ -42,7 +45,7 @@ class Subject {
             }
 
             setGrade(grade) {
-                this.grade;
+                this.grade = grade;
                 return this;
             }
 

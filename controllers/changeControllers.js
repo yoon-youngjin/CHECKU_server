@@ -96,7 +96,6 @@ export const initController = (req, res) => {
                                             return acc;
                                         }, {});
                                     });
-
                                     await res.status(200).send(obj);
                                 })();
                             });
@@ -109,8 +108,20 @@ export const initController = (req, res) => {
 export const changeAllController = (req, res) => {
     var jSessionId;
     let subjects;
-    let post = req.body;
-
+    let subjectId = req.query.subjectId;
+    let type = req.query.type;
+    let grade = req.query.grade;
+    if (!subjectId) {
+        subjectId = '';
+    }
+    if (!type) {
+        type = '';
+    }
+    if (!grade) {
+        grade = ['1', '2', '3', '4', '9'];
+    }
+    console.log(subjectId);
+    console.log(grade);
     (async () => {
         await fetch('https://kuis.konkuk.ac.kr/index.do', {
             headers: {
@@ -170,12 +181,14 @@ export const changeAllController = (req, res) => {
                 'Referrer-Policy': 'strict-origin-when-cross-origin',
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36',
             },
-            body: `Oe2Ue=%239e4ki&Le093=e%26*%08iu&AWeh_3=W%5E_zie&Hd%2Cpoi=_qw3e4&EKf8_%2F=Ajd%25md&WEh3m=ekmf3&rE%0Cje=JDow871&JKGhe8=NuMoe6&_)e7me=ne%2B3%7Cq&3kd3Nj=Qnd%40%251&_AUTH_MENU_KEY=1130420&%40d1%23ltYy=2022&%40d1%23ltShtm=B01011&%40d1%23openSust=${post.sbj_num}&%40d1%23pobtDiv=&%40d1%23sbjtId=&%40d1%23corsKorNm=&%40d1%23sprfNo=&%40d1%23argDeptFg=1&%40d1%23arglangNm=&%40d%23=%40d1%23&%40d1%23=dmParam&%40d1%23tp=dm&`,
+            body: `Oe2Ue=%239e4ki&Le093=e%26*%08iu&AWeh_3=W%5E_zie&Hd%2Cpoi=_qw3e4&EKf8_%2F=Ajd%25md&WEh3m=ekmf3&rE%0Cje=JDow871&JKGhe8=NuMoe6&_)e7me=ne%2B3%7Cq&3kd3Nj=Qnd%40%251&_AUTH_MENU_KEY=1130420&%40d1%23ltYy=2022&%40d1%23ltShtm=B01011&%40d1%23openSust=${subjectId}&%40d1%23pobtDiv=&%40d1%23sbjtId=&%40d1%23corsKorNm=&%40d1%23sprfNo=&%40d1%23argDeptFg=1&%40d1%23arglangNm=&%40d%23=%40d1%23&%40d1%23=dmParam&%40d1%23tp=dm&`,
             method: 'POST',
         })
-            .then((res) => res.json())
+            .then((res) => {
+                return res.json();
+            })
             .then(async (res) => {
-                subjects = res.DS_SUSTTIMETABLE.map(async (subjectInfo) => {
+                subjects = res.DS_SUSTTIMETABLE.filter((subjectInfo) => grade.includes(subjectInfo.OPEN_SHYR)).map(async (subjectInfo) => {
                     const subject = Subject.Builder.setId(subjectInfo.SBJT_ID)
                         .setName(subjectInfo.TYPL_KOR_NM)
                         .setProfessor(subjectInfo.KOR_NM)
@@ -187,8 +200,8 @@ export const changeAllController = (req, res) => {
                         .build();
                     return subject;
                 });
+                console.log(subjects);
             });
-        var obj;
         await Promise.all(subjects)
             .then(async (subjects) => {
                 return JSON.stringify(subjects);
@@ -206,6 +219,7 @@ export const changeController = (req, res) => {
         console.time('performance');
 
         let arr = post.sbj_num;
+        console.log(arr);
         await fetch('https://kuis.konkuk.ac.kr/index.do', {
             headers: {
                 accept: '*/*',
@@ -266,7 +280,10 @@ export const changeController = (req, res) => {
                     body: `Oe2Ue=%239e4ki&Le093=e%26*%08iu&AWeh_3=W%5E_zie&Hd%2Cpoi=_qw3e4&EKf8_%2F=Ajd%25md&WEh3m=ekmf3&rE%0Cje=JDow871&JKGhe8=NuMoe6&_)e7me=ne%2B3%7Cq&3kd3Nj=Qnd%40%251&_AUTH_MENU_KEY=1130420&%40d1%23ltYy=2022&%40d1%23ltShtm=B01011&%40d1%23openSust=&%40d1%23pobtDiv=&%40d1%23sbjtId=${data}&%40d1%23corsKorNm=&%40d1%23sprfNo=&%40d1%23argDeptFg=1&%40d1%23arglangNm=&%40d%23=%40d1%23&%40d1%23=dmParam&%40d1%23tp=dm&`,
                     method: 'POST',
                 })
-                    .then((e) => e.json())
+                    .then((e) => {
+                        console.log(typeof e);
+                        return e.json();
+                    })
                     .then((e) => {
                         let subjectInfo = e.DS_SUSTTIMETABLE[0];
                         const subject = Subject.Builder.setId(subjectInfo.SBJT_ID)
