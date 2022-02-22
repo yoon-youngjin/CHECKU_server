@@ -104,8 +104,23 @@ let monitor = {
                         .then((e) => e.json())
                         .then((e) => {
                             let subjectInfo = e.DS_SUSTTIMETABLE[0];
-                            console.log(subjectInfo.TLSN);
-                            this.count++;
+                            let temp = JSON.stringify(subjectInfo.TLSN);
+                            temp = temp.replace('"', '');
+                            let total = parseInt(temp.split('/')[1]);
+                            let current = parseInt(temp.split('/')[0]);
+
+                            // if (total - current > 0) {
+                            //     this.cancel_check = false;
+                            //     res.status(200).send(post.subject_num);
+                            // }
+                            if (this.count == 10) {
+                                this.cancel_check = false;
+                                res.status(200).send(post.subject_num);
+                            } else {
+                                console.log(total - current);
+                                console.log('NONO');
+                                this.count++;
+                            }
                         })
                         .catch((e) => console.log(e));
 

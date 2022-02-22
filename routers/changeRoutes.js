@@ -3,6 +3,8 @@ import { changeAllController, changeController, initController } from '../contro
 
 import { lectureController } from '../controllers/lectureControllers.js';
 
+import { insertController } from '../controllers/InsertControllers.js';
+
 // route만 관리
 const router = Router();
 
@@ -15,5 +17,7 @@ router.post('/click', lectureController);
 router.post('/change', changeController);
 
 router.post('/init', initController);
+
+router.post('/insertSubject', insertController);
 
 export default router;
