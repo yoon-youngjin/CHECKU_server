@@ -1,4 +1,4 @@
-class Subject {
+module.exports = class Subject {
     constructor(build) {
         if (build) {
             this.id = build.id;
@@ -14,6 +14,7 @@ class Subject {
 
     static get Builder() {
         class Builder {
+
             setId(id) {
                 this.id = id;
                 return this;
@@ -61,5 +62,5 @@ class Subject {
 
         return new Builder();
     }
+
 }
-export default Subject;

@@ -1,0 +1,7 @@
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"12\"]}","timestamp":"2022-02-14 02:50:23"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"12\"]}","timestamp":"2022-02-14 02:52:35"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"12\"]}","timestamp":"2022-02-14 02:54:03"}
+{"level":"error","message":"invalid subjectId: ","timestamp":"2022-02-14 02:54:04"}
+{"level":"error","timestamp":"2022-02-14 02:54:04"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"12\"]}","timestamp":"2022-02-14 02:57:03"}
+{"level":"error","message":"invalid subjectId","timestamp":"2022-02-14 02:57:03"}

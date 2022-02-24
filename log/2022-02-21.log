@@ -1,0 +1,5 @@
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[]}","timestamp":"2022-02-21 20:54:25"}
+{"level":"info","message":"GET: /subjects, QUERY: {\"departmentId\":\"126916\",\"type\":\"\"}","timestamp":"2022-02-21 20:54:28"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[]}","timestamp":"2022-02-21 20:54:34"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"3917\"]}","timestamp":"2022-02-21 20:54:41"}
+{"level":"info","message":"POST: /subjects, : {\"sbj_num\":[\"3917\"]}","timestamp":"2022-02-21 20:56:27"}
